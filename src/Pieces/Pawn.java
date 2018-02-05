@@ -23,8 +23,6 @@ public class Pawn extends Piece {
         value = 10;
     }
 
-    //TODO: Fix so that pawn becomes a queen when it reaches the end of the board
-
     /**
      * The pawn needs a unique setTile-method because of the "an passant"-move
      * @param newTile the destination-tile
