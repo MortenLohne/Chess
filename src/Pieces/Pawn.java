@@ -105,6 +105,7 @@ public class Pawn extends Piece {
             if (deltaX != 0) return false;
             //The pawn cant jump over other pieces on its first step
             if (tileReference.getBoard().getTile(x1, y1 + direction).hasPiece()) return false;
+            if (newTile.hasPiece()) return false;
         }
         return true;
     }
