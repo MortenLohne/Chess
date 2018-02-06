@@ -20,6 +20,7 @@ import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.net.URL;
 
 public class Graphics extends Application {
@@ -124,8 +125,8 @@ public class Graphics extends Application {
                     tileButtons[previouslyClickedX][previouslyClickedY].setBackground(previousSelectedColor);
                     drawBoard();
                     //randomBot.makeMove(Chess.mainBoard, Piece.BLACK);
-                    simplesearch.makeMove(Chess.mainBoard, Piece.BLACK);
-                    //MinMax.makeMove(Chess.mainBoard, Piece.BLACK);
+                    //simplesearch.makeMove(Chess.mainBoard, Piece.BLACK);
+                    MinMax.makeMove(Chess.mainBoard, Piece.BLACK);
                     drawBoard();
                 }
                 someTileIsSelected = false;
@@ -203,8 +204,9 @@ public class Graphics extends Application {
      */
     private void importChessPieces() {
         try {
-            URL url = new URL("http://i.stack.imgur.com/memI0.png");
-            BufferedImage bufferedImage = ImageIO.read(url);
+            File file = new File("C:\\Users\\Petter Daae\\Documents\\Java Prosjekter\\ChessLastAttempt\\src\\Frontend\\pieces.png");
+            //URL url = new URL("http://i.stack.imgur.com/memI0.png");
+            BufferedImage bufferedImage = ImageIO.read(file);
             for (int i = 0; i < 2; i++) {
                 for (int j = 0; j < 6; j++) {
                     chessPieceIcons[i][j] = SwingFXUtils.toFXImage(bufferedImage.getSubimage(j * 64, i * 64, 64, 64), null);

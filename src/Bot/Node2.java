@@ -1,6 +1,7 @@
 package Bot;
 
 import Backend.Board;
+import Backend.Piece;
 
 public class Node2 {
 
@@ -12,7 +13,11 @@ public class Node2 {
         this.board = board;
         this.index = index;
         if (previousNode != null) this.value = previousNode.getValue();
-        this.value += board.getValueOfPieces(color);
+        if (color == Piece.WHITE) {
+            this.value -= board.getValueOfPieces(color);
+        } else {
+            this.value += board.getValueOfPieces(color);
+        }
     }
 
     public int getValue() {
