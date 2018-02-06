@@ -24,7 +24,7 @@ import java.net.URL;
 public class Graphics extends Application {
 
     //Settings================================================
-    public static final boolean DEV_LISTENER = true;
+    public static final boolean DEV_LISTENER = false;
 
     //Frontend ===============================================
     private Button[][] tileButtons = new Button[8][8];
@@ -77,6 +77,8 @@ public class Graphics extends Application {
             chessGame.mainBoard = new Board();
             drawBoard();
         });
+
+
     }
 
     /**

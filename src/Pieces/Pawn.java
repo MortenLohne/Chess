@@ -5,6 +5,11 @@ import Backend.Tile;
 
 public class Pawn extends Piece {
 
+    /**
+     * Default-constructor
+     * @param tile
+     * @param color
+     */
     public Pawn(Tile tile, int color) {
         super(tile, color);
         this.iconIndex = 5;
@@ -45,17 +50,15 @@ public class Pawn extends Piece {
             newTile.setPiece(this);
             temp.setPiece(null);
             numberOfMoves++;
-            /*
             //Queen stuff
             if (newTile.getyPos() == 7 || newTile.getyPos() == 0) {
                 newTile.setPiece(new Queen(newTile, getColor()));
-            }*/
+            }
             return true;
         } else {
             return false;
         }
     }
-
 
     /**
      * @param newTile the next Tile
@@ -86,7 +89,6 @@ public class Pawn extends Piece {
         if (Math.abs(deltaX) > 1) return false;
         //So that the pawn can never move further than 2 in y-direction
         if (deltaY > 2) return false;
-
         if (deltaY == 1) {
             //The pawn cant 'walk' into other pieces
             if (deltaX == 0 && tileReference.getBoard().getTile(x2, y2).hasPiece()) return false;
@@ -125,8 +127,8 @@ public class Pawn extends Piece {
          * - deltaY = 1
          */
         //Out of bounds
-        if (xDirection == 1 && y1 == 7) return false;
-        if (xDirection == -1 && y1 == 0) return false;
+        if (xDirection == 1 && x1 == 7) return false;
+        if (xDirection == -1 && x1 == 0) return false;
         //Checks that the eventual target doesn't have the same color
         try {
             if (!tileReference.getBoard().getTile(x1 + xDirection, y1).hasOppositeColor(getColor())) return false;
@@ -138,9 +140,7 @@ public class Pawn extends Piece {
         // Cant do an passant if the opponent piece has moved more than once
         if (!tileReference.getBoard().getTile(x1 + xDirection, y1).getPiece().hasMovedOnce()) return false;
         // Only capture pieces that has moved once two tiles forward
-        if (y1 + yDirection != 2 || y1 + yDirection != 5) return false;
-
-
+        if (y1 + yDirection != 2 && y1 + yDirection != 5) return false;
         return true;
     }
 }
