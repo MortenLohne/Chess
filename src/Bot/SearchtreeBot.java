@@ -9,7 +9,7 @@ import java.util.ArrayList;
 public class SearchtreeBot {
 
     private int currentDepth = 0;
-    private final int DEPTH = 2;
+    private final int DEPTH = 3;
 
     private int nodesProssesed = 0;
 

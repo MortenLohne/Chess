@@ -3,6 +3,7 @@ package Frontend;
 import Backend.Board;
 import Backend.Chess;
 import Backend.Piece;
+import Bot.MinMax;
 import Bot.RandomBot;
 import Bot.SearchtreeBot;
 import javafx.application.Application;
@@ -122,8 +123,9 @@ public class Graphics extends Application {
                     someTileIsSelected = false;
                     tileButtons[previouslyClickedX][previouslyClickedY].setBackground(previousSelectedColor);
                     drawBoard();
-                    randomBot.makeMove(Chess.mainBoard, Piece.BLACK);
-                    //simplesearch.makeMove(Chess.mainBoard, Piece.BLACK);
+                    //randomBot.makeMove(Chess.mainBoard, Piece.BLACK);
+                    simplesearch.makeMove(Chess.mainBoard, Piece.BLACK);
+                    //MinMax.makeMove(Chess.mainBoard, Piece.BLACK);
                     drawBoard();
                 }
                 someTileIsSelected = false;
