@@ -3,6 +3,7 @@ package Frontend;
 import Backend.Board;
 import Backend.Chess;
 import Backend.Piece;
+import Bot.Bot03;
 import Bot.MinMax;
 import Bot.RandomBot;
 import Bot.SearchtreeBot;
@@ -126,7 +127,8 @@ public class Graphics extends Application {
                     drawBoard();
                     //randomBot.makeMove(Chess.mainBoard, Piece.BLACK);
                     //simplesearch.makeMove(Chess.mainBoard, Piece.BLACK);
-                    MinMax.makeMove(Chess.mainBoard, Piece.BLACK);
+                    //MinMax.makeMove(Chess.mainBoard, Piece.BLACK);
+                    Bot03.makeMove(Chess.mainBoard, Piece.BLACK);
                     drawBoard();
                 }
                 someTileIsSelected = false;

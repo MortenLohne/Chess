@@ -13,11 +13,7 @@ public class Node2 {
         this.board = board;
         this.index = index;
         if (previousNode != null) this.value = previousNode.getValue();
-        if (color == Piece.WHITE) {
-            this.value -= board.getValueOfPieces(color);
-        } else {
-            this.value += board.getValueOfPieces(color);
-        }
+        this.value += board.evaluateBoard(color);
     }
 
     public int getValue() {

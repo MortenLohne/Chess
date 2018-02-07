@@ -168,7 +168,7 @@ public class Board {
      * @param color
      * @return
      */
-    public int getValueOfPieces(int color) {
+    private int getValueOfPieces(int color) {
         int sum = 0;
         ArrayList<Piece> pieces = getAllPieces(color);
         for (Piece p : pieces) sum += p.getValue();
@@ -192,5 +192,9 @@ public class Board {
             ret += "\n-------------------\n";
         }
         return ret;
+    }
+
+    public void doMove(Move m) {
+        getPiece(m.getox(), m.getoy()).setTile(getTile(m.getnx(), m.getny()));
     }
 }
