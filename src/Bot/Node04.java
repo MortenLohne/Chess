@@ -25,4 +25,12 @@ public class Node04 {
     public Board getBoard() {
         return board;
     }
+
+    public int getIndex() {
+        return index;
+    }
+
+    public void setParent(Node04 newParent) {
+        this.parent = newParent;
+    }
 }

@@ -197,4 +197,8 @@ public class Board {
     public void doMove(Move m) {
         getPiece(m.getox(), m.getoy()).setTile(getTile(m.getnx(), m.getny()));
     }
+
+    public boolean hasPiece(int x, int y) {
+        return getTile(x, y).hasPiece();
+    }
 }

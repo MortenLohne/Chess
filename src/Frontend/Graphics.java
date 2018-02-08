@@ -3,11 +3,9 @@ package Frontend;
 import Backend.Board;
 import Backend.Chess;
 import Backend.Piece;
-import Bot.Bot03;
-import Bot.MinMax;
-import Bot.RandomBot;
-import Bot.SearchtreeBot;
+import Bot.*;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.event.Event;
 import javafx.geometry.Insets;
@@ -24,7 +22,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.net.URL;
 
-public class Graphics extends Application {
+public class Graphics extends Application implements Runnable {
 
     //Settings================================================
     public static final boolean DEV_LISTENER = false;
@@ -37,6 +35,7 @@ public class Graphics extends Application {
     private int previouslyClickedY;
     private boolean someTileIsSelected;
     private Background previousSelectedColor;
+    private boolean botHasMadeMove = true;
 
     //Backend ================================================
     private Chess chessGame;
@@ -121,16 +120,26 @@ public class Graphics extends Application {
         //System.out.println("ClickEvent: X=" + sourceX + " Y=" + sourceY);
         if (someTileIsSelected || chessGame.getTile(sourceX, sourceY).hasPiece()) {
             if (someTileIsSelected) {
-                if (chessGame.getTile(previouslyClickedX, previouslyClickedY).getPiece().setTile(chessGame.getTile(sourceX, sourceY))) {
+                if (botHasMadeMove && chessGame.getTile(previouslyClickedX, previouslyClickedY).getPiece().setTile(chessGame.getTile(sourceX, sourceY))) {
                     someTileIsSelected = false;
                     tileButtons[previouslyClickedX][previouslyClickedY].setBackground(previousSelectedColor);
                     drawBoard();
                     //randomBot.makeMove(Chess.mainBoard, Piece.BLACK);
                     //simplesearch.makeMove(Chess.mainBoard, Piece.BLACK);
                     //MinMax.makeMove(Chess.mainBoard, Piece.BLACK);
-                    Bot03.makeMove(Chess.mainBoard, Piece.BLACK);
-                    drawBoard();
+                    //Bot03.makeMove(Chess.mainBoard, Piece.BLACK);
+                    //Bot04.makeMove(Chess.mainBoard, Piece.BLACK);
+
+                    new Thread(() -> {
+                        botHasMadeMove = false;
+                        Bot04.makeMove(Chess.mainBoard, Piece.BLACK);
+                        Platform.runLater(this::drawBoard);
+                        botHasMadeMove = true;
+                    }).start();
+
+                    //drawBoard();
                 }
+
                 someTileIsSelected = false;
                 tileButtons[previouslyClickedX][previouslyClickedY].setBackground(previousSelectedColor);
             } else {
@@ -251,5 +260,10 @@ public class Graphics extends Application {
      */
     public static void main(String[] args) {
         launch(args);
+    }
+
+    @Override
+    public void run() {
+
     }
 }
