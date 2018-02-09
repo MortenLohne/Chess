@@ -26,7 +26,7 @@ public class King extends Piece {
         if (isValidMove(newTile)) {
             int deltaX = newTile.getxPos() - getX();
             int y1 = getY();
-            if (castling(newTile, getX(), y1, deltaX)) {
+            if (castling(newTile, y1, deltaX)) {
                 if (deltaX > 0 && tileReference.getBoard().getTile(7, y1).hasPiece()) {
                     tileReference.getBoard().getTile(7, y1).getPiece().moveWithoutChecking(tileReference.getBoard().getTile(5, y1));
                 } else if (tileReference.getBoard().getTile(0, y1).hasPiece()) {
@@ -58,7 +58,7 @@ public class King extends Piece {
         int deltaX = x2 - x1;
         int deltaY = y1 - y2;
         //================================
-        boolean castlingIsValid = castling(newTile, x1, y1, deltaX);
+        boolean castlingIsValid = castling(newTile, y1, deltaX);
         if ((Math.abs(deltaX) > 1 || Math.abs(deltaY) > 1) && !castlingIsValid) return false;
         return true;
     }
@@ -66,15 +66,16 @@ public class King extends Piece {
     /**
      * Checks if castling is valid
      * @param newTile
-     * @param x1
      * @param y1
      * @param deltaX
      * @return true if the move is a valid castling
      */
-    public boolean castling(Tile newTile, int x1, int y1, int deltaX) {
+    public boolean castling(Tile newTile, int y1, int deltaX) {
         if (this.hasMoved()) return false;
         if (Math.abs(deltaX) != 2) return false;
         if (newTile.getyPos() != y1) return false;
+        if (deltaX > 0 && !tileReference.getBoard().getTile(7, y1).hasPiece()) return false;
+        if (deltaX < 0 && !tileReference.getBoard().getTile(0, y1).hasPiece()) return false;
         if (deltaX > 0 && tileReference.getBoard().getTile(7, y1).hasPiece()) {
             if (tileReference.getBoard().getTile(7, y1).getPiece().hasMoved()) return false;
             if (tileReference.getBoard().getTile(6, y1).hasPiece() ||

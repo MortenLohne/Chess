@@ -145,7 +145,6 @@ public class Piece {
     }
 
     /**
-     * TODO: Evolve this function later
      * @return the value of the piece
      */
     public int getValue() {

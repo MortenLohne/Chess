@@ -40,11 +40,6 @@ public class Graphics extends Application implements Runnable {
     //Backend ================================================
     private Chess chessGame;
 
-    //Bots==================================
-    private RandomBot randomBot = new RandomBot();
-    private SearchtreeBot simplesearch = new SearchtreeBot();
-
-
     /**
      * Where everything starts!
      * @param stage
@@ -54,32 +49,30 @@ public class Graphics extends Application implements Runnable {
     public void start(Stage stage) throws Exception {
         setup();
 
-        HBox buttonBox = new HBox();
         Button resetButton = new Button("Reset board");
-        resetButton.setBackground(getBackground(Color.GREEN));
-        resetButton.setTextFill(Color.WHITE);
+        /*resetButton.setOnAction(e -> {
+            chessGame.mainBoard = new Board();
+            botHasMadeMove = true;
+            drawBoard();
+        });*/
+
+        HBox buttonBox = new HBox();
         buttonBox.getChildren().add(resetButton);
 
+        StackPane stackPane = new StackPane();
+        stackPane.getChildren().addAll(buttonBox);
+
         VBox mainBox = new VBox();
+        mainBox.getChildren().addAll(grid, stackPane);
 
-        mainBox.getChildren().addAll(grid, buttonBox);
-
-        //grid.setAlignment(Pos.CENTER);
         Scene mainScene = new Scene(mainBox);
-        //mainScene.getStylesheets().add("Frontend/stylesheet.css");
+
         stage.setScene(mainScene);
         stage.setTitle("Chess");
-        //stage.sizeToScene();
+
         stage.show();
         stage.setMinWidth(stage.getWidth());
         stage.setMinHeight(stage.getHeight());
-
-        resetButton.setPrefSize(stage.getWidth(), resetButton.getHeight());
-        resetButton.setOnAction(e -> {
-            chessGame.mainBoard = new Board();
-            drawBoard();
-        });
-
 
     }
 
@@ -100,7 +93,7 @@ public class Graphics extends Application implements Runnable {
     private void setActionListeners() {
         for (int x = 0; x < 8; x++) {
             for (int y = 0; y < 8; y++) {
-                tileButtons[x][y].setOnAction(e -> {
+                tileButtons[x][y].setOnMouseClicked(e -> {
                     if (DEV_LISTENER) {
                         devActionListener(e);
                     } else {
@@ -124,22 +117,13 @@ public class Graphics extends Application implements Runnable {
                     someTileIsSelected = false;
                     tileButtons[previouslyClickedX][previouslyClickedY].setBackground(previousSelectedColor);
                     drawBoard();
-                    //randomBot.makeMove(Chess.mainBoard, Piece.BLACK);
-                    //simplesearch.makeMove(Chess.mainBoard, Piece.BLACK);
-                    //MinMax.makeMove(Chess.mainBoard, Piece.BLACK);
-                    //Bot03.makeMove(Chess.mainBoard, Piece.BLACK);
-                    //Bot04.makeMove(Chess.mainBoard, Piece.BLACK);
-
                     new Thread(() -> {
                         botHasMadeMove = false;
                         Bot04.makeMove(Chess.mainBoard, Piece.BLACK);
                         Platform.runLater(this::drawBoard);
                         botHasMadeMove = true;
                     }).start();
-
-                    //drawBoard();
                 }
-
                 someTileIsSelected = false;
                 tileButtons[previouslyClickedX][previouslyClickedY].setBackground(previousSelectedColor);
             } else {
