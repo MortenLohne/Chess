@@ -50,11 +50,12 @@ public class Graphics extends Application implements Runnable {
         setup();
 
         Button resetButton = new Button("Reset board");
-        /*resetButton.setOnAction(e -> {
+        resetButton.setBackground(getBackground(Color.GREEN));
+        resetButton.setOnAction(e -> {
             chessGame.mainBoard = new Board();
             botHasMadeMove = true;
             drawBoard();
-        });*/
+        });
 
         HBox buttonBox = new HBox();
         buttonBox.getChildren().add(resetButton);
@@ -74,6 +75,8 @@ public class Graphics extends Application implements Runnable {
         stage.setMinWidth(stage.getWidth());
         stage.setMinHeight(stage.getHeight());
 
+
+        resetButton.setMinWidth(stage.getWidth());
     }
 
     /**

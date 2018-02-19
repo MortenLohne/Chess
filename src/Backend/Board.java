@@ -7,10 +7,6 @@ public class Board {
 
     private Tile[][] tiles;
 
-    // TODO: Not completely sure how I will integrate these lists (but it will be a major improvement to the performance of the bots)
-    private ArrayList<Piece> whitePieces;
-    private ArrayList<Piece> blackPieces;
-
     /**
      * Default constructor
      * Initiates the tiles-array and fills it with pieces
@@ -19,8 +15,6 @@ public class Board {
         tiles = new Tile[8][8];
         setup();
         initPieces();
-        whitePieces = getAllPieces(Piece.WHITE);
-        blackPieces = getAllPieces(Piece.BLACK);
     }
 
     /**
@@ -35,8 +29,6 @@ public class Board {
                 tiles[x][y].setBoard(this);
             }
         }
-        whitePieces = getAllPieces(Piece.WHITE);
-        blackPieces = getAllPieces(Piece.BLACK);
     }
 
     /**
