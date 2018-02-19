@@ -1,6 +1,10 @@
 package BackendImprovement;
 
+
 public class Board {
+
+    public static final int WHITE = 0;
+    public static final int BLACK = 1;
 
     public static final int a = 0, b = 1, c = 2, d = 3, e = 4, f = 5, g = 6, h = 7;
     public static final byte NO_PIECE = 0;
@@ -20,7 +24,50 @@ public class Board {
      *      black pieces: negative values
      */
     private byte[][] pieces = new byte[8][8];
-    private boolean[][] tileHasMoved = new boolean[8][8];
+    private boolean[][] anPassant = new boolean[2][8];
+    private boolean[][] castling = new boolean[2][2];
+
+
+
+    public boolean isLegalMove(int x1, int y1, int x2, int y2) {
+        byte piece = (byte) Math.abs(getPiece(x1, y1));
+        switch (piece) {
+            case PAWN : if(Pawn.isValidMove(x1, y1, x2, y2, getPiece(x1, y1), this)) return true; break;
+            case KNIGHT : break;
+            case BISHOP : break;
+            case ROOK : break;
+            case QUENN : break;
+            case KING : break;
+            default: break;
+        }
+        return false;
+    }
+
+    public boolean pawnHasMoved(byte piece, int x1) {
+        return !anPassant[getColor(piece)][x1];
+    }
+
+    public boolean isValidAnPassant(byte piece, int x2) {
+        return anPassant[getOppositeColor(piece)][x2];
+    }
+
+    public int getOppositeColor(byte piece) {
+        if (isBlack(piece)) {
+            return WHITE;
+        } else {
+            return BLACK;
+        }
+    }
+
+    /**
+     * @param x2
+     * @param y2
+     * @param piece
+     * @return
+     */
+    public boolean hasOppositeColor(int x2, int y2, byte piece) {
+        return getPiece(x2, y2) - piece != 0;
+    }
 
     /**
      * Initiates the starting position
@@ -61,20 +108,58 @@ public class Board {
         setPiece(f, 2, BPAWN);
         setPiece(g, 2, BPAWN);
         setPiece(h, 2, BPAWN);
+
+        for (int i = 0; i < anPassant.length; i++) {
+            for (int j = 0; j < anPassant[i].length; j++) {
+                anPassant[i][j] = true;
+            }
+        }
+
+        for (int i = 0; i < castling.length; i++) {
+            for (int j = 0; j < castling[i].length; j++) {
+                castling[i][j] = true;
+            }
+        }
     }
 
     /**
      * Performs a move
+     * Updates anPassant array
      * @param x1 "a letter"
      * @param y1 "a number"
      * @param x2 "a letter"
      * @param y2 "a number"
      */
     public void doMove(int x1, int y1, int x2, int y2) {
-        setPiece(x2, y2, getPiece(x1, y1));
+        byte piece = getPiece(x1, y1);
+        setPiece(x2, y2, piece);
         removePiece(x1, y1);
-        tileHasMoved[x1][y1] = true;
-        tileHasMoved[x2][y2] = true;
+
+        //An passant stuff
+        if (Math.abs(piece) == PAWN) {
+            int deltaY = Math.abs(y1 - y2);
+            if (deltaY == 1) {
+                if (isBlack(piece)) anPassant[BLACK][x1] = false;
+                else anPassant[WHITE][x1] = false;
+            }
+        }
+
+        //Castling stuff
+        if (Math.abs(piece) == ROOK) {
+            int index;
+            if (x1 == a) index = 0;
+            else index = 1;
+            castling[getColor(piece)][index] = false;
+        }
+    }
+
+    /**
+     * @param piece
+     * @return the color of the piece
+     */
+    public int getColor(byte piece) {
+        if (isBlack(piece)) return 0;
+        else return 1;
     }
 
     /**
@@ -86,20 +171,10 @@ public class Board {
         return getPiece(x, y) != 0;
     }
 
-    public boolean hasMoved(int x, int y) {
-        byte piece = getPiece(x, y);
-        if (Math.abs(piece) == PAWN) {
-            if (isBlack(piece)) {
-
-            } else {
-
-            }
-        } else {
-
-        }
-        return false;
-    }
-
+    /**
+     * @param piece
+     * @return true if the piece is black
+     */
     public boolean isBlack(int piece) {
         return piece < 0;
     }
@@ -120,7 +195,7 @@ public class Board {
      * @param piece "the new piece
      */
     public void setPiece(int xPos, int yPos, byte piece) {
-        yPos++;
+        yPos--;
         pieces[xPos][yPos] = piece;
     }
 
