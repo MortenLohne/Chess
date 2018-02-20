@@ -7,8 +7,8 @@ public class Board {
 
     public static final int a = 0, b = 1, c = 2, d = 3, e = 4, f = 5, g = 6, h = 7;
     public static final byte NO_PIECE = 0;
-    public static final byte PAWN = 1, KNIGHT = 2, BISHOP = 3, ROOK = 4, QUENN = 5, KING = 6;
-    public static final byte BPAWN = -1, BKNIGHT = -2, BBISHOP = -3, BROOK = -4, BQUENN = -5, BKING = -6;
+    public static final byte PAWN = 6, KNIGHT = 5, BISHOP = 4, ROOK = 3, QUENN = 2, KING = 1;
+    public static final byte BPAWN = -6, BKNIGHT = -5, BBISHOP = -4, BROOK = -3, BQUENN = -2, BKING = -1;
 
     /**
      *      0: no piece
@@ -24,20 +24,35 @@ public class Board {
      */
     private byte[][] pieces = new byte[8][8];
     private boolean[][] anPassant = new boolean[2][8];
-    private boolean[][] castling = new boolean[2][2];
+    public boolean[][] castling = new boolean[2][2];
+    public boolean[] kingHasMoved = new boolean[2];
+
+    public Board() {
+        initStartPosition();
+    }
+
+    private boolean standardMoveCheck(int x1, int y1, int x2, int y2) {
+        if (hasPiece(x2, y2) && !hasOppositeColor(x2, y2, getPiece(x1, y1))) {
+            System.out.println("rfrbrb");
+            return false;
+        }
+        if (x1 == x2 && y1 == y2) return false;
+        return true;
+    }
 
     public boolean isLegalMove(int x1, int y1, int x2, int y2) {
         byte piece = (byte) Math.abs(getPiece(x1, y1));
+        if (!standardMoveCheck(x1, y1, x2, y2)) return false;
         switch (piece) {
             case PAWN : if(!Pawn.isValidMove(x1, y1, x2, y2, getPiece(x1, y1), this)) return false; break;
             case KNIGHT : if(!Knight.isValidMove(x1, x2, y1, y2)) return false; break;
             case BISHOP : if(!Bishop.isValidMove(x1, y1, x2, y2, this)) return false; break;
             case ROOK : if(!Rook.isValidMove(x1, y1, x2, y2, this)) return false; break;
             case QUENN : if(!Queen.isValidMove(x1, y1, x2, y2, this)) return false; break;
-            case KING : break;
+            case KING : if(!King.isValidMove(x1, y1, x2, y2, this)) return false; break;
             default: break;
         }
-        return false;
+        return true;
     }
 
     public boolean pawnHasMoved(byte piece, int x1) {
@@ -70,41 +85,41 @@ public class Board {
      * Initiates the starting position
      */
     public void initStartPosition() {
-        setPiece(a, 1, ROOK);
-        setPiece(b, 1, KNIGHT);
-        setPiece(c, 1, BISHOP);
-        setPiece(d, 1, QUENN);
-        setPiece(e, 1, KING);
-        setPiece(f, 1, BISHOP);
-        setPiece(g, 1, KNIGHT);
-        setPiece(h, 1, ROOK);
+        setPiece(a, 0, ROOK);
+        setPiece(b, 0, KNIGHT);
+        setPiece(c, 0, BISHOP);
+        setPiece(d, 0, KING);
+        setPiece(e, 0, QUENN);
+        setPiece(f, 0, BISHOP);
+        setPiece(g, 0, KNIGHT);
+        setPiece(h, 0, ROOK);
 
-        setPiece(a, 1, BROOK);
-        setPiece(b, 1, BKNIGHT);
-        setPiece(c, 1, BBISHOP);
-        setPiece(d, 1, BQUENN);
-        setPiece(e, 1, BKING);
-        setPiece(f, 1, BBISHOP);
-        setPiece(g, 1, BKNIGHT);
-        setPiece(h, 1, BROOK);
+        setPiece(a, 7, BROOK);
+        setPiece(b, 7, BKNIGHT);
+        setPiece(c, 7, BBISHOP);
+        setPiece(d, 7, BKING);
+        setPiece(e, 7, BQUENN);
+        setPiece(f, 7, BBISHOP);
+        setPiece(g, 7, BKNIGHT);
+        setPiece(h, 7, BROOK);
 
-        setPiece(a, 2, PAWN);
-        setPiece(b, 2, PAWN);
-        setPiece(c, 2, PAWN);
-        setPiece(d, 2, PAWN);
-        setPiece(e, 2, PAWN);
-        setPiece(f, 2, PAWN);
-        setPiece(g, 2, PAWN);
-        setPiece(h, 2, PAWN);
+        setPiece(a, 1, PAWN);
+        setPiece(b, 1, PAWN);
+        setPiece(c, 1, PAWN);
+        setPiece(d, 1, PAWN);
+        setPiece(e, 1, PAWN);
+        setPiece(f, 1, PAWN);
+        setPiece(g, 1, PAWN);
+        setPiece(h, 1, PAWN);
 
-        setPiece(a, 2, BPAWN);
-        setPiece(b, 2, BPAWN);
-        setPiece(c, 2, BPAWN);
-        setPiece(d, 2, BPAWN);
-        setPiece(e, 2, BPAWN);
-        setPiece(f, 2, BPAWN);
-        setPiece(g, 2, BPAWN);
-        setPiece(h, 2, BPAWN);
+        setPiece(a, 6, BPAWN);
+        setPiece(b, 6, BPAWN);
+        setPiece(c, 6, BPAWN);
+        setPiece(d, 6, BPAWN);
+        setPiece(e, 6, BPAWN);
+        setPiece(f, 6, BPAWN);
+        setPiece(g, 6, BPAWN);
+        setPiece(h, 6, BPAWN);
 
         for (int i = 0; i < anPassant.length; i++) {
             for (int j = 0; j < anPassant[i].length; j++) {
@@ -127,7 +142,10 @@ public class Board {
      * @param x2 "a letter"
      * @param y2 "a number"
      */
-    public void doMove(int x1, int y1, int x2, int y2) {
+    public boolean doMove(int x1, int y1, int x2, int y2) {
+
+        if (!isLegalMove(x1, y1, x2, y2)) return false;
+
         byte piece = getPiece(x1, y1);
         setPiece(x2, y2, piece);
         removePiece(x1, y1);
@@ -149,7 +167,6 @@ public class Board {
                 if (isBlack(piece)) anPassant[BLACK][x1] = false;
                 else anPassant[WHITE][x1] = false;
             }
-            return;
         }
 
         //Castling stuff
@@ -159,6 +176,19 @@ public class Board {
             else index = 1;
             castling[getColor(piece)][index] = false;
         }
+        if (Math.abs(piece) == KING) {
+            kingHasMoved[getColor(piece)] = true;
+            int deltaX = x2 - x1;
+            if (King.castling(y1, y2, deltaX, piece, this)) {
+                if (deltaX > 0) {
+                    this.doMove(7, y1, 5, y1);
+                } else {
+                    this.doMove(0, y1, 3, y1);
+                }
+            }
+        }
+
+        return true;
     }
 
     /**
@@ -203,7 +233,6 @@ public class Board {
      * @param piece "the new piece
      */
     public void setPiece(int xPos, int yPos, byte piece) {
-        yPos--;
         pieces[xPos][yPos] = piece;
     }
 
