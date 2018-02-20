@@ -128,7 +128,7 @@ public class Pawn extends Piece {
      * @param xDirection
      * @return
      */
-    private boolean anPassant(int x1, int y1, int yDirection, int xDirection) {
+    public boolean anPassant(int x1, int y1, int yDirection, int xDirection) {
         //System.out.println(System.currentTimeMillis() + " X1 = " + x1 + " Y1 = " + y1 + " yDirection = " + yDirection + " xDirection = " + xDirection);
         //Some simple checks for the setPiece method:
         if (Math.abs(xDirection) != 1 || Math.abs(yDirection) != 1) return false;

@@ -1,6 +1,5 @@
 package BackendImprovement;
 
-
 public class Board {
 
     public static final int WHITE = 0;
@@ -27,16 +26,14 @@ public class Board {
     private boolean[][] anPassant = new boolean[2][8];
     private boolean[][] castling = new boolean[2][2];
 
-
-
     public boolean isLegalMove(int x1, int y1, int x2, int y2) {
         byte piece = (byte) Math.abs(getPiece(x1, y1));
         switch (piece) {
-            case PAWN : if(Pawn.isValidMove(x1, y1, x2, y2, getPiece(x1, y1), this)) return true; break;
-            case KNIGHT : break;
-            case BISHOP : break;
-            case ROOK : break;
-            case QUENN : break;
+            case PAWN : if(!Pawn.isValidMove(x1, y1, x2, y2, getPiece(x1, y1), this)) return false; break;
+            case KNIGHT : if(!Knight.isValidMove(x1, x2, y1, y2)) return false; break;
+            case BISHOP : if(!Bishop.isValidMove(x1, y1, x2, y2, this)) return false; break;
+            case ROOK : if(!Rook.isValidMove(x1, y1, x2, y2, this)) return false; break;
+            case QUENN : if(!Queen.isValidMove(x1, y1, x2, y2, this)) return false; break;
             case KING : break;
             default: break;
         }
@@ -137,11 +134,22 @@ public class Board {
 
         //An passant stuff
         if (Math.abs(piece) == PAWN) {
+            int deltaX = x2 - x1;
+            int yDirection;
+            if (isBlack(piece)) {
+                yDirection = 1;
+            } else {
+                yDirection = -1;
+            }
+            if (Pawn.anPassant(x1, y1, yDirection, deltaX, piece, this)) {
+                removePiece(x2, y1);
+            }
             int deltaY = Math.abs(y1 - y2);
             if (deltaY == 1) {
                 if (isBlack(piece)) anPassant[BLACK][x1] = false;
                 else anPassant[WHITE][x1] = false;
             }
+            return;
         }
 
         //Castling stuff

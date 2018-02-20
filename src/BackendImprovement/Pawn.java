@@ -51,7 +51,7 @@ public class Pawn {
      * @param xDirection
      * @return
      */
-    private static boolean anPassant(int x1, int y1, int yDirection, int xDirection, byte piece, Board board) {
+    public static boolean anPassant(int x1, int y1, int yDirection, int xDirection, byte piece, Board board) {
         //System.out.println(System.currentTimeMillis() + " X1 = " + x1 + " Y1 = " + y1 + " yDirection = " + yDirection + " xDirection = " + xDirection);
         //Some simple checks for the setPiece method:
         if (Math.abs(xDirection) != 1 || Math.abs(yDirection) != 1) return false;
