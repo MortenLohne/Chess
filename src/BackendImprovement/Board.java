@@ -1,14 +1,19 @@
 package BackendImprovement;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+
 public class Board {
 
-    public static final int WHITE = 0;
-    public static final int BLACK = 1;
+    public static boolean checkCheck = true;
+
+    public static final int WHITE = 1;
+    public static final int BLACK = 0;
 
     public static final int a = 0, b = 1, c = 2, d = 3, e = 4, f = 5, g = 6, h = 7;
     public static final byte NO_PIECE = 0;
-    public static final byte PAWN = 6, KNIGHT = 5, BISHOP = 4, ROOK = 3, QUENN = 2, KING = 1;
-    public static final byte BPAWN = -6, BKNIGHT = -5, BBISHOP = -4, BROOK = -3, BQUENN = -2, BKING = -1;
+    public static final byte PAWN = 6, KNIGHT = 4, BISHOP = 5, ROOK = 3, QUENN = 2, KING = 1;
+    public static final byte BPAWN = -6, BKNIGHT = -4, BBISHOP = -5, BROOK = -3, BQUENN = -2, BKING = -1;
 
     /**
      *      0: no piece
@@ -22,20 +27,118 @@ public class Board {
      *      white pieces: positive values
      *      black pieces: negative values
      */
-    private byte[][] pieces = new byte[8][8];
-    private boolean[][] anPassant = new boolean[2][8];
+    public byte[][] pieces = new byte[8][8];
+    public boolean[][] anPassant = new boolean[2][8];
     public boolean[][] castling = new boolean[2][2];
     public boolean[] kingHasMoved = new boolean[2];
+
+    public boolean movePutsKingInCheck(int x1, int y1, int x2, int y2) {
+        Board tempBoard = new Board(this);
+        tempBoard.moveWithoutValidation(x1, y1, x2, y2);
+        int color = getColor(getPiece(x1, y1));
+        //System.out.println(tempBoard.toString());
+        boolean isChecked;
+        if (color == BLACK) {
+            isChecked = tempBoard.isChecked(WHITE);
+        } else {
+            isChecked = tempBoard.isChecked(BLACK);
+        }
+        return isChecked;
+    }
+
+    public boolean isChecked(int color) {
+        ArrayList<Move> allMoves = getAllMoves(color);
+        for (Move m : allMoves) {
+            byte piece = getPiece(m.x2, m.y2);
+            if (Math.abs(piece) == 1) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public ArrayList<Move> getAllMoves(int color) {
+        ArrayList<Move> allMoves = new ArrayList<>();
+        for (int x1 = 0; x1 < 8; x1++) {
+            for (int y1 = 0; y1 < 8; y1++) {
+                for (int x2 = 0; x2 < 8; x2++) {
+                    for (int y2 = 0; y2 < 8; y2++) {
+                        byte piece = getPiece(x1, y1);
+                        if (piece == 0) continue;
+                        if (getColor(piece) != color) continue;
+                        Move m;
+                        if (isLegalMove(x1, y1, x2, y2)) {
+                            m = new Move(x1, y1, x2, y2);
+                            allMoves.add(m);
+                        }
+                    }
+                }
+            }
+        }
+        return allMoves;
+    }
+
+    public int evaluateBoard(int color) {
+        int total = 0;
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
+                total += getPieceVal(getPiece(i, j), color);
+            }
+        }
+        return total;
+    }
+
+    private int getPieceVal(byte piece, int color) {
+        byte pieceVal = (byte) Math.abs(piece);
+        int i;
+        if (getColor(piece) == color) i = 1;
+        else i = -1;
+        switch (pieceVal) {
+            case PAWN : return 1*i;
+            case KNIGHT : return 3*i;
+            case BISHOP : return 3*i;
+            case ROOK : return 5*i;
+            case QUENN : return 9*i;
+            case KING : return 100*i;
+        }
+
+        return 0;
+    }
+
+    public void doMove(Move m) {
+        moveWithoutValidation(m.x1, m.y1, m.x2, m.y2);
+    }
+
+    public Board(Board board) {
+        this.pieces = cloneArray(board.pieces);
+        this.anPassant = cloneArray(board.anPassant);
+        this.castling = cloneArray(board.castling);
+        this.kingHasMoved = Arrays.copyOf(board.kingHasMoved, board.castling.length);
+    }
+
+    public static byte[][] cloneArray(byte[][] array) {
+        byte[][] newBytes = new byte[8][8];
+        for (int i = 0; i < 8; i++) {
+            newBytes[i] = Arrays.copyOf(array[i], array[i].length);
+        }
+        return newBytes;
+    }
+
+    public static boolean[][] cloneArray(boolean[][] array) {
+        boolean[][] newArray = new boolean[array.length][array[0].length];
+        for (int i = 0; i < array.length; i++) {
+            newArray[i] = Arrays.copyOf(array[i], array[i].length);
+        }
+        return newArray;
+    }
 
     public Board() {
         initStartPosition();
     }
 
     private boolean standardMoveCheck(int x1, int y1, int x2, int y2) {
-        if (hasPiece(x2, y2) && !hasOppositeColor(x2, y2, getPiece(x1, y1))) {
-            System.out.println("rfrbrb");
-            return false;
-        }
+        if (hasPiece(x2, y2) && !hasOppositeColor(x1, y1, getPiece(x2, y2))) return false;
+
         if (x1 == x2 && y1 == y2) return false;
         return true;
     }
@@ -45,12 +148,21 @@ public class Board {
         if (!standardMoveCheck(x1, y1, x2, y2)) return false;
         switch (piece) {
             case PAWN : if(!Pawn.isValidMove(x1, y1, x2, y2, getPiece(x1, y1), this)) return false; break;
-            case KNIGHT : if(!Knight.isValidMove(x1, x2, y1, y2)) return false; break;
+            case KNIGHT : if(!Knight.isValidMove(x1, y1, x2, y2)) return false; break;
             case BISHOP : if(!Bishop.isValidMove(x1, y1, x2, y2, this)) return false; break;
             case ROOK : if(!Rook.isValidMove(x1, y1, x2, y2, this)) return false; break;
             case QUENN : if(!Queen.isValidMove(x1, y1, x2, y2, this)) return false; break;
             case KING : if(!King.isValidMove(x1, y1, x2, y2, this)) return false; break;
             default: break;
+        }
+        if (checkCheck) {
+            checkCheck = false;
+            if (movePutsKingInCheck(x1, y1, x2, y2)) {
+                //System.out.println("Cant move because the King is or will be checked!");
+                checkCheck = true;
+                return false;
+            }
+            checkCheck = true;
         }
         return true;
     }
@@ -61,6 +173,11 @@ public class Board {
 
     public boolean isValidAnPassant(byte piece, int x2) {
         return anPassant[getOppositeColor(piece)][x2];
+    }
+
+    public boolean equals(Board board) {
+        if (Arrays.equals(board.pieces, this.pieces)) return true;
+        return false;
     }
 
     public int getOppositeColor(byte piece) {
@@ -78,7 +195,10 @@ public class Board {
      * @return
      */
     public boolean hasOppositeColor(int x2, int y2, byte piece) {
-        return getPiece(x2, y2) - piece != 0;
+        byte piece2 = getPiece(x2, y2);
+        int c1 = getColor(piece);
+        int c2 = getColor(piece2);
+        return c1 != c2;
     }
 
     /**
@@ -146,14 +266,38 @@ public class Board {
 
         if (!isLegalMove(x1, y1, x2, y2)) return false;
 
+
+
         byte piece = getPiece(x1, y1);
-        setPiece(x2, y2, piece);
-        removePiece(x1, y1);
+
+        //Castling stuff
+        if (Math.abs(piece) == ROOK) {
+            int index;
+            if (x1 == a) index = 0;
+            else index = 1;
+            castling[getColor(piece)][index] = false;
+        }
+        if (Math.abs(piece) == KING) {
+            int deltaX = x2 - x1;
+            if (King.castling(y1, y2, deltaX, piece, this)) {
+                if (deltaX > 0) {
+                    this.moveWithoutValidation(7, y1, 4, y1);
+                } else {
+                    this.moveWithoutValidation(0, y1, 2, y1);
+                }
+            }
+            kingHasMoved[getColor(piece)] = true;
+        }
 
         //An passant stuff
         if (Math.abs(piece) == PAWN) {
             int deltaX = x2 - x1;
             int yDirection;
+            if (y2 == 0 || y2 == 7) {
+                removePiece(x1, y1);
+                setPiece(x2, y2, QUENN);
+                return true;
+            }
             if (isBlack(piece)) {
                 yDirection = 1;
             } else {
@@ -168,27 +312,21 @@ public class Board {
                 else anPassant[WHITE][x1] = false;
             }
         }
+        setPiece(x2, y2, piece);
+        removePiece(x1, y1);
 
-        //Castling stuff
-        if (Math.abs(piece) == ROOK) {
-            int index;
-            if (x1 == a) index = 0;
-            else index = 1;
-            castling[getColor(piece)][index] = false;
-        }
-        if (Math.abs(piece) == KING) {
-            kingHasMoved[getColor(piece)] = true;
-            int deltaX = x2 - x1;
-            if (King.castling(y1, y2, deltaX, piece, this)) {
-                if (deltaX > 0) {
-                    this.doMove(7, y1, 5, y1);
-                } else {
-                    this.doMove(0, y1, 3, y1);
-                }
-            }
-        }
+
+
+
 
         return true;
+    }
+
+
+    public void moveWithoutValidation(int x1, int y1, int x2, int y2) {
+        byte piece = getPiece(x1, y1);
+        setPiece(x2, y2, piece);
+        removePiece(x1, y1);
     }
 
     /**

@@ -17,15 +17,17 @@ public class King {
         if (y2 != y1) return false;
         if (deltaX > 0 && !board.hasPiece(7, y1)) return false;
         if (deltaX < 0 && !board.hasPiece(0, y1)) return false;
-        if (deltaX > 0 && !board.hasPiece(7, y1)) {
-            if (board.castling[board.getColor(piece)][1]) return false;
-            if (board.hasPiece(6, y1) ||
-                    board.hasPiece(5, y1)) return false;
-        } else if (!board.hasPiece(0, y1)){
-            if (board.castling[board.getColor(piece)][0]) return false;
+
+
+        if (deltaX > 0 && board.hasPiece(7, y1)) {
+            if (!board.castling[board.getColor(piece)][1]) return false;
+            if (board.hasPiece(4, y1) ||
+                    board.hasPiece(5, y1) ||
+                    board.hasPiece(6, y1)) return false;
+        } else if (board.hasPiece(0, y1)){
+            if (!board.castling[board.getColor(piece)][0]) return false;
             if (board.hasPiece(1, y1) ||
-                    board.hasPiece(2, y1) ||
-                    board.hasPiece(3, y1)) return false;
+                    board.hasPiece(2, y1)) return false;
         }
         return true;
     }

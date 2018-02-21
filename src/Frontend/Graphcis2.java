@@ -4,6 +4,7 @@ import Backend.Chess;
 import Backend.Piece;
 import BackendImprovement.Board;
 import Bot.Bot04;
+import Bot.Bot05;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.embed.swing.SwingFXUtils;
@@ -39,7 +40,7 @@ public class Graphcis2 extends Application {
     private boolean botHasMadeMove = true;
 
     //Backend ================================================
-    private Board mainBoard;
+    public static Board mainBoard;
 
     /**
      * Where everything starts!
@@ -47,9 +48,8 @@ public class Graphcis2 extends Application {
      * @throws Exception
      */
     @Override
-    public void start(Stage stage) throws Exception {
+    public void start(Stage stage) {
         setup();
-
         Button resetButton = new Button("Reset board");
         resetButton.setBackground(getBackground(Color.GREEN));
         resetButton.setOnAction(e -> {
@@ -57,27 +57,20 @@ public class Graphcis2 extends Application {
             botHasMadeMove = true;
             drawBoard();
         });
-
         HBox buttonBox = new HBox();
         buttonBox.getChildren().add(resetButton);
-
         StackPane stackPane = new StackPane();
         stackPane.getChildren().addAll(buttonBox);
-
         VBox mainBox = new VBox();
         mainBox.getChildren().addAll(grid, stackPane);
-
         Scene mainScene = new Scene(mainBox);
-
         stage.setScene(mainScene);
         stage.setTitle("Chess");
-
         stage.show();
         stage.setMinWidth(stage.getWidth());
         stage.setMinHeight(stage.getHeight());
-
-
         resetButton.setMinWidth(stage.getWidth());
+        resetButton.setMinHeight(resetButton.getHeight());
     }
 
     /**
@@ -114,25 +107,29 @@ public class Graphcis2 extends Application {
     private void botActionListener(Event e) {
         int sourceX = GridPane.getColumnIndex((Node) e.getSource());
         int sourceY = GridPane.getRowIndex((Node) e.getSource());
+
+        int realX = Math.abs(7 - sourceX);
+        int realY = Math.abs(7- sourceY);
         //System.out.println("ClickEvent: X=" + sourceX + " Y=" + sourceY);
-        if (someTileIsSelected || mainBoard.hasPiece(sourceX, sourceY)) {
+        //System.out.println("realX = " + realX + " realY = " + realY);
+        if (someTileIsSelected || mainBoard.hasPiece(realX, realY)) {
             if (someTileIsSelected) {
-                if (botHasMadeMove && mainBoard.doMove(previouslyClickedX, previouslyClickedY, sourceX, sourceY)) {
+                if (botHasMadeMove && mainBoard.doMove(previouslyClickedX, previouslyClickedY, realX, realY)) {
                     someTileIsSelected = false;
-                    tileButtons[previouslyClickedX][previouslyClickedY].setBackground(previousSelectedColor);
+                    tileButtons[Math.abs(7-previouslyClickedX)][Math.abs(7-previouslyClickedY)].setBackground(previousSelectedColor);
                     drawBoard();
                     new Thread(() -> {
                         botHasMadeMove = false;
-
+                        Bot05.makeMove(mainBoard, Board.BLACK);
                         Platform.runLater(this::drawBoard);
                         botHasMadeMove = true;
                     }).start();
                 }
                 someTileIsSelected = false;
-                tileButtons[previouslyClickedX][previouslyClickedY].setBackground(previousSelectedColor);
+                tileButtons[Math.abs(7-previouslyClickedX)][Math.abs(7-previouslyClickedY)].setBackground(previousSelectedColor);
             } else {
-                previouslyClickedX = sourceX;
-                previouslyClickedY = sourceY;
+                previouslyClickedX = realX;
+                previouslyClickedY = realY;
                 previousSelectedColor = tileButtons[sourceX][sourceY].getBackground();
                 tileButtons[sourceX][sourceY].setBackground(getBackground(Color.RED));
                 someTileIsSelected = true;
@@ -150,7 +147,8 @@ public class Graphcis2 extends Application {
         int realX = Math.abs(7 - sourceX);
         int realY = Math.abs(7- sourceY);
 
-        //System.out.println("ClickEvent: X=" + sourceX + " Y=" + sourceY);
+        System.out.println("ClickEvent: X=" + sourceX + " Y=" + sourceY);
+        System.out.println("realX = " + realX + " realY = " + realY);
         if (someTileIsSelected || mainBoard.hasPiece(realX, realY)) {
             if (someTileIsSelected) {
                 if (mainBoard.doMove(previouslyClickedX, previouslyClickedY, realX, realY)) {
