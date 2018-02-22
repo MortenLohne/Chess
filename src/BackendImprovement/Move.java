@@ -13,4 +13,24 @@ public class Move {
         this.x2 = x2;
         this.y2 = y2;
     }
+
+    public String toString() {
+        String r = "" + intToChar(x1) + (y1+1) + intToChar(x2) + (y2+1);
+        return r;
+    }
+
+    private String intToChar(int i) {
+        switch (i) {
+            case 0 : return "a";
+            case 1 : return "b";
+            case 2 : return "c";
+            case 3 : return "d";
+            case 4 : return "e";
+            case 5 : return "f";
+            case 6 : return "g";
+            case 7 : return "h";
+            default:break;
+        }
+        return "å";
+    }
 }

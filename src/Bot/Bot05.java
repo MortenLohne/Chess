@@ -13,7 +13,23 @@ public class Bot05 {
 
     public static int originalColor;
     public static int CURRENT_DEPTH = 0;
-    public static final int DEPTH = 4;
+    public static int DEPTH = 4;
+
+    public static boolean shouldStop = false;
+
+    public Board botBoard;
+
+    public static long t0;
+
+    public Bot05() {
+        botBoard = new Board();
+    }
+
+    public static void makeMove(Board board, int color, int depth) {
+        DEPTH = depth;
+        makeMove(board, color);
+        DEPTH = 4;
+    }
 
     public static void makeMove(Board board, int color) {
 
@@ -31,27 +47,38 @@ public class Bot05 {
 
         CURRENT_DEPTH++;
 
+        System.out.println("info depth " + CURRENT_DEPTH + " nodes " + firstGeneration.size() + " time 0");
+
         //Get all the end nodes
-        long t0 = System.currentTimeMillis();
+        t0 = System.currentTimeMillis();
         ArrayList<Node05> endNodes = getEndNodes(firstGeneration, getOppositeColor(color));
         long t1 = System.currentTimeMillis();
         double total = (double) (t1 - t0) / 1000;
 
+        /*
         if ((int) total != 0) System.out.printf("Nodes processed: %d%n" +
                         "Time (seconds): %.2f %n" +
                         "Nodes/sec: %d%n" + "================================%n",
                 endNodes.size(),
                 total,
                 endNodes.size() / (int) total);
+        */
+
+
 
         Move bestMove = moves.get(minmax(endNodes));
+        System.out.println("bestmove " + bestMove.toString());
+
+        /*
+        TODO: Remove this for guiplay
         board.doMove(bestMove);
+        */
         CURRENT_DEPTH = 0;
     }
 
     public static int minmax(ArrayList<Node05> endNodes) {
         ArrayList<Node05> currentGeneration = endNodes;
-        for (int i = DEPTH; i > 1; i--) {
+        for (int i = CURRENT_DEPTH; i > 1; i--) {
             if (i % 2 == 0) {
                 currentGeneration = min(currentGeneration);
             } else {
@@ -175,6 +202,10 @@ public class Bot05 {
             Board board = node.getBoard();
             ArrayList<Move> moves = board.getAllMoves(color);
             for (Move move : moves) {
+                if (shouldStop) {
+                    shouldStop = false;
+                    return currentGeneration;
+                }
                 Board tempBoard = new Board(board);
                 tempBoard.doMove(move);
                 Node05 newNode = new Node05(tempBoard, node, node.getIndex());
@@ -182,11 +213,27 @@ public class Bot05 {
             }
         }
         CURRENT_DEPTH++;
+        System.out.println("info depth " + CURRENT_DEPTH + " nodes " + nextGeneration.size() +
+            " time " + (System.currentTimeMillis() - t0));
         return getEndNodes(nextGeneration, getOppositeColor(color));
     }
 
     private static int getOppositeColor(int color) {
         if (color == Board.WHITE) return Board.BLACK;
         return Board.WHITE;
+    }
+
+    public void setStartpos() {
+        botBoard = new Board();
+    }
+
+    public void execMove(Move m) {
+        botBoard.doMove(m);
+    }
+
+    public void execMoves(ArrayList<Move> moves) {
+        for (Move m : moves) {
+            execMove(m);
+        }
     }
 }
